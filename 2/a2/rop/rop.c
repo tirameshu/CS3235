@@ -18,7 +18,7 @@ void rop(FILE *f)
 	fsize = ftell(f); // finding file size
 	fseek(f, 0, SEEK_SET); // going back to start
 
-	read_size = (size_t) i < (size_t) fsize ? i : fsize; 
+	read_size = (size_t) i < (size_t) fsize ? i : fsize;
 	fread(buf, 1, read_size, f);
 	fclose(f);
 
