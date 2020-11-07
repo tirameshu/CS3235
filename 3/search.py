@@ -1,6 +1,6 @@
 """
 Run:
-python3 search.py -d dictionary-file -ob1 obervation-1 -ob2 obversation-2
+python3 search.py -d dictionary-file -ob1 obervation-1-anon -ob2 obversation-2
 """
 
 import getopt
@@ -79,13 +79,13 @@ def compare_observation(dictionary, process_result):
         observed_in_size = process_result[anon_id]["in_size"]
         observed_out_size = process_result[anon_id]["out_size"]
 
-        # key, value = metric, [absolute difference between observation and urls 1 - 35]
+        # key, value = metric, [absolute difference between observation and urls 1-anon - 35]
         match_count = {"in_size": [], "out_size": []}
 
         # assign rank to each url
         # in terms of the difference between
         # sample mean and profiled mean
-        # 1 being the smallest; 35 being the largest
+        # 1-anon being the smallest; 35 being the largest
         for url_id in dictionary:
             profiled_in_size = dictionary[url_id]["in_size"]
             profiled_out_size = dictionary[url_id]["out_size"]
@@ -95,7 +95,7 @@ def compare_observation(dictionary, process_result):
 
         ranked_result = assign_rank(match_count)
 
-        # TODO: ensure 1-to-1 mapping
+        # TODO: ensure 1-anon-to-1-anon mapping
         top_match = get_top_match(ranked_result)
 
         match_result[anon_id] = top_match
@@ -199,7 +199,7 @@ def search(dictionary_file, observation_1, observation_2):
     print('Matching completed in ' + str(round(end_time - start_time, 2)) + 's')
 
 def usage():
-    print("usage: " + "python3 search.py -d dictionary-output-file -ob1 observation-1 -ob2 observation-2")
+    print("usage: " + "python3 search.py -d dictionary-output-file -ob1 observation-1-anon -ob2 observation-2")
 
 dictionary_file = observation_1 = observation_2 = None
 

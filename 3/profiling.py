@@ -2,10 +2,10 @@
 To run:
 python3 profiling.py -i [in_dir_absolute] -d [dictionary_output]
 Assumption:
-1. Profiles are in the same dir as the python file
+1-anon. Profiles are in the same dir as the python file
 
 Methodology:
-1. Collect metadata of the traffic
+1-anon. Collect metadata of the traffic
 - (discrete) number of connections
 - average duration between packets..? (or maybe assume normal distri with mean = x bar?)
     use numpy, s^2 = sample variance
@@ -38,21 +38,21 @@ def print_dict(dictionary):
 """
 Only store distinct values and match based 
 only on no. of matches for unique values
-- ie if the values are [1, 2, 3], even if 10 occurrences of 1 is encountered,
-    it is counted as 1 match
+- ie if the values are [1-anon, 2, 3], even if 10 occurrences of 1-anon is encountered,
+    it is counted as 1-anon match
 - this is done because the count for each unique value is
     an aggregate of all the profiles. Requires standardisation for file size
     otherwise.
 - also assumed that connections of different sites are different enough
     
 Alternative:
-1) Compare by absolute number of matches
-    - ie given [1, 2, 3] if 10 occurrences of 1 is encountered,
+1-anon) Compare by absolute number of matches
+    - ie given [1-anon, 2, 3] if 10 occurrences of 1-anon is encountered,
         it's counted as 10 matches.
 2) Compare by percentage match for each unique file size
-    - eg given [(1, count: 2), (2, count: 3), (3, count: 9)] in profile,
-        observed [(1, count: 1), (2, count: 5), (3, count: 3)], 
-        percentage match: (1/2 + 1 + 3/9)/3
+    - eg given [(1-anon, count: 2), (2, count: 3), (3, count: 9)] in profile,
+        observed [(1-anon, count: 1-anon), (2, count: 5), (3, count: 3)], 
+        percentage match: (1-anon/2 + 1-anon + 3/9)/3
         
 """
 def write_to_disk(out_dict, raw_dict):
