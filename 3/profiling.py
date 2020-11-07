@@ -24,7 +24,6 @@ import sys
 
 from collections import defaultdict
 from datetime import datetime
-from datetime import timedelta
 from pathlib import Path
 
 def parse_time(time):
@@ -40,19 +39,24 @@ def write_to_disk(out_dict, raw_dict):
 
         list_in_dur = raw_dict[url_id]["in_dur"]
         mu_in_dur, sigma_in_dur = statistics.mean(list_in_dur), statistics.variance(list_in_dur)
-        processed_dict[url_id]["in_dur_var"] = (mu_in_dur, sigma_in_dur) # mean, variance
+        processed_dict[url_id]["in_dur"] = (mu_in_dur, sigma_in_dur) # mean, variance
 
         list_out_dur = raw_dict[url_id]["out_dur"]
         mu_out_dur, sigma_out_dur = statistics.mean(list_out_dur), statistics.variance(list_out_dur)
-        processed_dict[url_id]["in_dur_var"] = (mu_out_dur, sigma_out_dur)
+        processed_dict[url_id]["out_dur"] = (mu_out_dur, sigma_out_dur)
 
         list_in_size = raw_dict[url_id]["in_size"]
         mu_in_size, sigma_in_size = statistics.mean(list_in_size), statistics.variance(list_in_size)
-        processed_dict[url_id]["in_dur_var"] = (mu_in_size, sigma_in_size)
+        processed_dict[url_id]["in_size"] = (mu_in_size, sigma_in_size)
 
         list_out_size = raw_dict[url_id]["out_size"]
         mu_out_size, sigma_out_size = statistics.mean(list_out_size), statistics.variance(list_out_size)
-        processed_dict[url_id]["in_dur_var"] = (mu_out_size, sigma_out_size)
+        processed_dict[url_id]["out_size"] = (mu_out_size, sigma_out_size)
+
+
+    items = [(int(k), v) for k, v in processed_dict.items()]
+    items.sort(key=lambda x: x[0])
+    processed_dict = dict(items)
 
     with open(out_dict, 'wb') as dict_file:
         pickle.dump(processed_dict, dict_file)
@@ -71,7 +75,7 @@ def build_index(in_dir, out_dict):
 
         file_paths = [f for f in Path(profile_dir).iterdir() if f.is_file()]
 
-        # extract and save document ID
+        # extract and save url ID
         for file in file_paths:
             url_id = file.stem
 
@@ -94,7 +98,7 @@ def build_index(in_dir, out_dict):
 
                 timestamp, data_size, direction = line.strip().split(" ")
 
-                timestamp = (parse_time(timestamp) - zeroth_time).total_seconds()  # timedelta obj
+                timestamp = (parse_time(timestamp) - zeroth_time).total_seconds()
                 data_size = int(data_size)
 
                 if direction == "in":
@@ -131,7 +135,7 @@ def usage():
 input_directory = output_file_dictionary = None
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'i:d:p:')
+    opts, args = getopt.getopt(sys.argv[1:], 'i:d:')
 except getopt.GetoptError:
     usage()
     sys.exit(2)
