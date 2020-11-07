@@ -40,7 +40,7 @@ def assign_rank(difference):
     return ranked_result
 
 def get_top_match(ranked_result):
-    max_score = 0
+    min_rank = 100
     best_matched_url = 0
     all_values = list(ranked_result.values()) # nested list of ranks
 
@@ -51,8 +51,8 @@ def get_top_match(ranked_result):
 
     for i in range (length):
         score = sum(map(lambda x: x[i], all_values))
-        if score > max_score:
-            max_score = score
+        if score < min_rank:
+            min_rank = score
             best_matched_url = i+1 # url_id
 
     return best_matched_url
@@ -78,6 +78,7 @@ def compare_observation(dictionary, process_result):
         # sample mean and profiled mean
         # 1 being the smallest; 35 being the largest
         for url_id in dictionary:
+            assert (type(url_id) == int)
             profiled_ratio = dictionary[url_id]["ratio"]
             profiled_in_dur = dictionary[url_id]["in_dur"]
             profiled_out_dur = dictionary[url_id]["out_dur"]
@@ -166,6 +167,19 @@ def process_observation(observation_dir):
 
     return process_result
 
+def accuracy_check(id_list):
+    id_list = list(map(int, id_list))
+    correct = 0
+    for i in range (len(id_list)):
+        if id_list[i] == i+1:
+            correct += 1
+
+    if correct == 0:
+        accuracy = 0
+    else:
+        accuracy = correct / len(id_list)
+
+    print(f"Accuracy: {accuracy}")
 
 def search(dictionary_file, observation_1, observation_2):
     print('\nStarting search\n')
@@ -182,7 +196,10 @@ def search(dictionary_file, observation_1, observation_2):
     items_1 = list(res1.items())
     items_1.sort(key=lambda x: x[1])
     assert(len(set(items_1)) == len(items_1))
+
+    # TODO: adapt for actual naming system: [n]-anon
     corresponding_anon_id_1 = list(map(lambda x: x[0], items_1))
+    accuracy_check(corresponding_anon_id_1)
 
     print("Processing observation2\n")
     process_result_2 = process_observation(observation_2)
@@ -193,6 +210,7 @@ def search(dictionary_file, observation_1, observation_2):
     items_2.sort(key=lambda x: x[1])
     assert (len(set(items_2)) == len(items_2))
     corresponding_anon_id_2 = list(map(lambda x: x[0], items_2))
+    accuracy_check(corresponding_anon_id_2)
 
     results_file = "output.txt"
     # parse and evaluate each query and write results to disk one by one
