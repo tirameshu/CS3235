@@ -29,34 +29,38 @@ from pathlib import Path
 def parse_time(time):
     return datetime.strptime(time, '%H:%M:%S.%f')
 
+def print_dict(dictionary):
+    for url_id in dictionary:
+        print(f'\nURL {url_id}')
+        for field in dictionary[url_id]:
+            print(f'{field}: {dictionary[url_id][field]}')
+
+"""
+Only store distinct values and match based 
+only on no. of matches for unique values
+- ie if the values are [1, 2, 3], even if 10 occurrences of 1 is encountered,
+    it is counted as 1 match
+- this is done because the count for each unique value is
+    an aggregate of all the profiles. Requires standardisation for file size
+    otherwise.
+- also assumed that connections of different sites are different enough
+    
+Alternative:
+1) Compare by absolute number of matches
+    - ie given [1, 2, 3] if 10 occurrences of 1 is encountered,
+        it's counted as 10 matches.
+2) Compare by percentage match for each unique file size
+    - eg given [(1, count: 2), (2, count: 3), (3, count: 9)] in profile,
+        observed [(1, count: 1), (2, count: 5), (3, count: 3)], 
+        percentage match: (1/2 + 1 + 3/9)/3
+        
+"""
 def write_to_disk(out_dict, raw_dict):
-    processed_dict = defaultdict()
-
-    for url_id in raw_dict:
-        processed_dict[url_id] = {}
-
-        processed_dict[url_id]["ratio"] = '%.3f'%(raw_dict[url_id]["in"]/raw_dict[url_id]["out"])
-
-        list_in_dur = raw_dict[url_id]["in_dur"]
-        mu_in_dur, sigma_in_dur = statistics.mean(list_in_dur), statistics.variance(list_in_dur)
-        processed_dict[url_id]["in_dur"] = (mu_in_dur, sigma_in_dur) # mean, variance
-
-        list_out_dur = raw_dict[url_id]["out_dur"]
-        mu_out_dur, sigma_out_dur = statistics.mean(list_out_dur), statistics.variance(list_out_dur)
-        processed_dict[url_id]["out_dur"] = (mu_out_dur, sigma_out_dur)
-
-        list_in_size = raw_dict[url_id]["in_size"]
-        mu_in_size, sigma_in_size = statistics.mean(list_in_size), statistics.variance(list_in_size)
-        processed_dict[url_id]["in_size"] = (mu_in_size, sigma_in_size)
-
-        list_out_size = raw_dict[url_id]["out_size"]
-        mu_out_size, sigma_out_size = statistics.mean(list_out_size), statistics.variance(list_out_size)
-        processed_dict[url_id]["out_size"] = (mu_out_size, sigma_out_size)
-
-
-    items = [(int(k), v) for k, v in processed_dict.items()]
+    items = [(int(k), v) for k, v in raw_dict.items()]
     items.sort(key=lambda x: x[0])
     processed_dict = dict(items)
+
+    print_dict(processed_dict)
 
     with open(out_dict, 'wb') as dict_file:
         pickle.dump(processed_dict, dict_file)
@@ -82,47 +86,28 @@ def build_index(in_dir, out_dict):
             # get all lines from the current document
             lines = linecache.getlines(str(file))
 
-            # count number of ins and outs, and take ratio?
-            # - the first few connections may be impt?
-            # record duration betw consecutive ins
-            # record duration betw consecutive outs
-            # record in_size
-            # record out_size
-
-            last_in = 0
-            last_out = 0
-
-            zeroth_time = parse_time('00:00:00.0')
-
             for line in lines:
 
                 timestamp, data_size, direction = line.strip().split(" ")
-
-                timestamp = (parse_time(timestamp) - zeroth_time).total_seconds()
                 data_size = int(data_size)
 
                 if direction == "in":
-                    in_dur = timestamp - last_in
-                    last_in = timestamp
 
                     if url_id not in raw_dict:
-                        raw_dict[url_id] = {"in": 1, "out": 0, "in_dur": [in_dur], "out_dur": [],
-                                                  "in_size": [data_size], "out_size": []}
-                    else:
-                        raw_dict[url_id]["in"] += 1
-                        raw_dict[url_id]["in_dur"].append(in_dur)
-                        raw_dict[url_id]["in_size"].append(data_size)
+                        raw_dict[url_id] = {"in": 0, "out": 0,
+                                                  "in_size": set(), "out_size": set()}
+                    raw_dict[url_id]["in"] += 1
+                    raw_dict[url_id]["in_size"].add(data_size)
+                elif direction == "out":
+
+                    if url_id not in raw_dict:
+                        raw_dict[url_id] = {"in": 0, "out": 0,
+                                                  "in_size": set(), "out_size": set()}
+                    raw_dict[url_id]["out"] += 1
+                    raw_dict[url_id]["out_size"].add(data_size)
                 else:
-                    out_dur = timestamp - last_out
-                    last_out = timestamp
-
-                    if url_id not in raw_dict:
-                        raw_dict[url_id] = {"out": 1, "in": 0, "in_dur": [], "out_dur": [out_dur],
-                                                  "in_size": [], "out_size": [data_size]}
-                    else:
-                        raw_dict[url_id]["out"] += 1
-                        raw_dict[url_id]["out_dur"].append(out_dur)
-                        raw_dict[url_id]["out_size"].append(data_size)
+                    print("Unknown direction!\n")
+                    sys.exit(2)
 
     # process data and write dict to file
     write_to_disk(out_dict, raw_dict)
