@@ -169,8 +169,8 @@ def search(dictionary_file, observation_1, observation_2):
     assert(len(set(items_1)) == len(items_1))
 
     corresponding_anon_id_1 = list(map(lambda x: x[0], items_1))
-    print(corresponding_anon_id_1)
-    accuracy_check(corresponding_anon_id_1)
+    # print(corresponding_anon_id_1)
+    # accuracy_check(corresponding_anon_id_1)
 
     print("Processing observation2")
     process_result_2 = process_observation(observation_2)
@@ -181,8 +181,8 @@ def search(dictionary_file, observation_1, observation_2):
     items_2.sort(key=lambda x: x[1])
     assert (len(set(items_2)) == len(items_2))
     corresponding_anon_id_2 = list(map(lambda x: x[0], items_2))
-    print(corresponding_anon_id_2)
-    accuracy_check(corresponding_anon_id_2)
+    # print(corresponding_anon_id_2)
+    # accuracy_check(corresponding_anon_id_2)
 
     results_file = "output.txt"
     # parse and evaluate each query and write results to disk one by one
