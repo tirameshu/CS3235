@@ -32,7 +32,6 @@ def assign_rank(match_count):
         labelled_lst = match_count[metric]
 
         labelled_lst.sort(key=lambda x: x[1], reverse=True)
-        # print(f'Raw result for {metric}: {labelled_lst}')
 
         id_with_rank = []
         for i in range (len(labelled_lst)):
@@ -40,9 +39,6 @@ def assign_rank(match_count):
 
         id_with_rank.sort(key=lambda x: x[1]) # sorted by url_id
         ranked_result[metric] = list(map(lambda x: x[0], id_with_rank)) # list of ranks in order of url_id
-
-    # print(f'Ranked result: ')
-    # print_dict(ranked_result)
 
     return ranked_result
 
@@ -109,7 +105,7 @@ def process_observation(observation_dir):
     raw_dict = {}
 
     for file in file_paths:
-        anon_id = file.stem
+        anon_id = file.stem.strip("-anon")
 
         lines = linecache.getlines(str(file))
 
@@ -152,7 +148,7 @@ def accuracy_check(id_list):
     else:
         accuracy = correct / len(id_list)
 
-    print(f"Accuracy: {accuracy}")
+    print(f"Accuracy: {accuracy}\n")
 
 def search(dictionary_file, observation_1, observation_2):
     print('\nStarting search\n')
@@ -161,27 +157,29 @@ def search(dictionary_file, observation_1, observation_2):
     with open(dictionary_file, 'rb') as dict_file:
         dictionary = pickle.load(dict_file)
 
-    print("Processing observation1\n")
+    print("Processing observation1")
     # {anon_id: {"in": [count], "out": [count], "in_size": { set }, "out_size": { set } }
     process_result_1 = process_observation(observation_1)
 
-    print("Comparing observation1 against profiles\n")
+    print("Comparing observation1 against profiles")
     res1 = compare_observation(dictionary, process_result_1) # {anon_id: url_id}
     items_1 = list(res1.items())
     items_1.sort(key=lambda x: x[1])
     assert(len(set(items_1)) == len(items_1))
     corresponding_anon_id_1 = list(map(lambda x: x[0], items_1))
+    print(corresponding_anon_id_1)
     accuracy_check(corresponding_anon_id_1)
 
-    print("Processing observation2\n")
+    print("Processing observation2")
     process_result_2 = process_observation(observation_2)
 
-    print("Comparing observation2 against profiles\n")
+    print("Comparing observation2 against profiles")
     res2 = compare_observation(dictionary, process_result_2)
     items_2 = list(res2.items())
     items_2.sort(key=lambda x: x[1])
     assert (len(set(items_2)) == len(items_2))
     corresponding_anon_id_2 = list(map(lambda x: x[0], items_2))
+    print(corresponding_anon_id_2)
     accuracy_check(corresponding_anon_id_2)
 
     results_file = "output.txt"
@@ -199,7 +197,7 @@ def search(dictionary_file, observation_1, observation_2):
     print('Matching completed in ' + str(round(end_time - start_time, 2)) + 's')
 
 def usage():
-    print("usage: " + "python3 search.py -d dictionary-output-file -ob1 observation-1-anon -ob2 observation-2")
+    print("usage: " + "python3 search.py -d dictionary-output-file -f observation-1-anon -s observation-2")
 
 dictionary_file = observation_1 = observation_2 = None
 

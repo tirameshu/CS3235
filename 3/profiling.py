@@ -19,7 +19,6 @@ Methodology:
 import getopt
 import linecache
 import pickle
-import statistics
 import sys
 
 from collections import defaultdict
@@ -60,7 +59,7 @@ def write_to_disk(out_dict, raw_dict):
     items.sort(key=lambda x: x[0])
     processed_dict = dict(items)
 
-    print_dict(processed_dict)
+    # print_dict(processed_dict)
 
     with open(out_dict, 'wb') as dict_file:
         pickle.dump(processed_dict, dict_file)
