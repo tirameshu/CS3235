@@ -1,6 +1,6 @@
 """
 Run:
-python3 search.py -d dictionary-file -ob1 obervation-1-anon -ob2 obversation-2
+python3 search.py -d dictionary-file -f obervation-1-anon -s obversation-2
 """
 
 import getopt
@@ -168,7 +168,6 @@ def search(dictionary_file, observation_1, observation_2):
     items_1.sort(key=lambda x: x[1])
     assert(len(set(items_1)) == len(items_1))
 
-    # TODO: adapt for actual naming system: [n]-anon
     corresponding_anon_id_1 = list(map(lambda x: x[0], items_1))
     print(corresponding_anon_id_1)
     accuracy_check(corresponding_anon_id_1)
