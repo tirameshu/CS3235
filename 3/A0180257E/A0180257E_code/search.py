@@ -6,7 +6,6 @@ python3 search.py -d dictionary-file -f obervation-1-anon -s obversation-2
 import getopt
 import linecache
 import pickle
-import statistics
 import sys
 import time
 
@@ -152,17 +151,17 @@ def accuracy_check(id_list):
     print(f"Accuracy: {accuracy}\n")
 
 def search(dictionary_file, observation_1, observation_2):
-    print('\nStarting search\n')
+    # print('\nStarting search\n')
     start_time = time.time()  # clock the run
 
     with open(dictionary_file, 'rb') as dict_file:
         dictionary = pickle.load(dict_file)
 
-    print("Processing observation1")
+    # print("Processing observation1")
     # {anon_id: {"in": [count], "out": [count], "in_size": { set }, "out_size": { set } }
     process_result_1 = process_observation(observation_1)
 
-    print("Comparing observation1 against profiles")
+    # print("Comparing observation1 against profiles")
     res1 = compare_observation(dictionary, process_result_1) # {anon_id: url_id}
     items_1 = list(res1.items())
     items_1.sort(key=lambda x: x[1])
@@ -172,10 +171,10 @@ def search(dictionary_file, observation_1, observation_2):
     # print(corresponding_anon_id_1)
     # accuracy_check(corresponding_anon_id_1)
 
-    print("Processing observation2")
+    # print("Processing observation2")
     process_result_2 = process_observation(observation_2)
 
-    print("Comparing observation2 against profiles")
+    # print("Comparing observation2 against profiles")
     res2 = compare_observation(dictionary, process_result_2)
     items_2 = list(res2.items())
     items_2.sort(key=lambda x: x[1])
@@ -190,13 +189,13 @@ def search(dictionary_file, observation_1, observation_2):
     assert(len(corresponding_anon_id_1) == len(corresponding_anon_id_2))
 
     with open(results_file, 'w') as r:
-        print("Sending to output\n")
+        # print("Sending to output\n")
         for i in range (len(corresponding_anon_id_1)):
             result_string = str(corresponding_anon_id_1[i]) + " " + str(corresponding_anon_id_2[i])
             r.write(result_string + '\n')
 
     end_time = time.time()
-    print('Matching completed in ' + str(round(end_time - start_time, 2)) + 's')
+    # print('Matching completed in ' + str(round(end_time - start_time, 2)) + 's')
 
 def usage():
     print("usage: " + "python3 search.py -d dictionary-output-file -f observation-1-anon -s observation-2")
