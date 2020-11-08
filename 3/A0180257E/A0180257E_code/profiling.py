@@ -71,10 +71,10 @@ def build_index(in_dir, out_dict):
     # obtain file paths of documents to be indexed
     dir_paths = [f for f in Path(in_dir).iterdir() if f.is_dir()]
 
-    print(f'\nAccessing profiles at {in_dir}')
+    # print(f'\nAccessing profiles at {in_dir}')
 
     for profile_dir in dir_paths:
-        print(f"\n== At {profile_dir.stem} ==")
+        # print(f"\n== At {profile_dir.stem} ==")
 
         file_paths = [f for f in Path(profile_dir).iterdir() if f.is_file()]
 
@@ -111,7 +111,7 @@ def build_index(in_dir, out_dict):
     # process data and write dict to file
     write_to_disk(out_dict, raw_dict)
 
-    print("Done indexing")
+    # print("Done indexing")
 
 def usage():
     print("usage: " + "python3 profiling.py -i directory-of-documents -d dictionary-output-file")

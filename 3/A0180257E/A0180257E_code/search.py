@@ -183,7 +183,7 @@ def search(dictionary_file, observation_1, observation_2):
     # print(corresponding_anon_id_2)
     # accuracy_check(corresponding_anon_id_2)
 
-    results_file = "output.txt"
+    results_file = "result.txt"
     # parse and evaluate each query and write results to disk one by one
 
     assert(len(corresponding_anon_id_1) == len(corresponding_anon_id_2))
